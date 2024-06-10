@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && bun x cap run android",
+    "cap": "bun x cap update && bun x cap sync",
+    "build": "vite build",
+    "android": "bun run build && bun x cap run android --target Pixel_3a_API_34_extension_level_7_x86_64",
     "preview": "vite preview"
   },
   "dependencies": {
