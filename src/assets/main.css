@@ -1,0 +1,21 @@
+@import './base.css';
+
+
+* {
+    --color-1: #4B4E6C;
+    --color-2: #6E7189;
+
+    --color-3: #BD6558;
+
+    --color-red: #C52943;
+    --color-green: #4C967D;
+
+    --text-1: #fdfdfd;
+}
+
+
+
+#app {
+    height: 100dvh;
+    width: 100vw;
+}
