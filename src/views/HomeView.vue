@@ -175,7 +175,17 @@ export default {
         <div class="category-today">
             <h2>Today</h2>
 
-            <template v-for="[item, field, i, visible], j in dateToday.dates" :key="`DATES-${h}-DATE-${j}-ITEM-${i}`">
+            <p class="nothing-text">
+                <div v-if="!dateToday">
+                    <i>nothing to do..</i>
+                </div>
+                <div v-else-if="!dateToday.dates.find(date => date[3])">
+                    <i>nothing to see..</i>
+                </div>
+            </p>
+
+            <template v-if="dateToday?.dates">
+            <template v-for="[item, field, i, visible], j in dateToday.dates" :key="`DATES-TODAY-DATE-${j}-ITEM-${i}`">
             <date-component
                 :item="item"
                 :field="field"
@@ -184,9 +194,7 @@ export default {
                 :visible="visible"
             />
             </template>
-            <p v-if="!dateToday" class="nothing-text"><i>nothing to do..</i></p>
-            <p v-else-if="!dateToday.dates.find(date => date[3])" class="nothing-text"><i>nothing to see..</i></p>
-
+            </template>
         </div>
 
         <template v-for="category, h in datesAfterToday" :key="`DATES-${h}`">
@@ -338,6 +346,23 @@ section.timeline .category-today h2 {
 section.timeline .category-today .nothing-text {
     margin-left: 2em;
     margin-bottom: 2em;
+}
+
+section.timeline .category-today .nothing-text > * {
+    animation: nothing-text-spawn-animation 200ms ease-out;
+}
+
+@keyframes nothing-text-spawn-animation {
+    from {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+        translate: 0 -30px;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .date-category-enter-to, .date-category-leave-from {
