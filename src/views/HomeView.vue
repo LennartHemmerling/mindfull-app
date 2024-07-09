@@ -162,7 +162,7 @@ export default {
 
     <section class="todo">
         <component :is="itemWrapper" v-model="items">
-            <template v-for="[item, index, visible] in items" :key="`ITEM-${item.id}`">
+            <template v-for="[item, index, visible] in items" :key="`ITEM-${index}`">
             <item-component
                 :item="item"
                 :index="index"
