@@ -317,7 +317,7 @@ section.todo .add-item svg {
 section.timeline {
     padding: 1em 0 1em calc(35px + 1em); 
 
-    border-right: solid 3px var(--color-3);
+    border-right: solid 5px var(--color-3);
 }
 
 section.timeline h2 {
