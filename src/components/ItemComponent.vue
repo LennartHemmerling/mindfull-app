@@ -7,7 +7,7 @@ export default {
         CheckItemComponent,
         CounterComponent
     },
-    props: ["item", "index", "visible"],
+    props: ["item", "index", "visible", "editMode"],
     computed: {
         itemContainerStyle() {
             return this.index % 2 === 0 ? "item-container even" : "item-container"
@@ -22,37 +22,41 @@ export default {
 <template>
 <transition name="item">
     <div v-show="visible" :class="itemContainerStyle">
-        <span>
-            <template v-for="tag, i in item.tags" :key="`ITEM-${index}-TAG-${i}`">
-            <div class="item-tag" :style="`background-color: ${tag.name}`"></div>
-            </template>
-        </span>
+        <fa-icon v-if="editMode" icon="fa-icon fa-grip" />
 
-        <span>
-            <div>
-                <h3 v-if="item.name" class="item-name">{{ item.name }}</h3>
-
-                <template v-for="paragraph, i in contentParagraphs" :key="`ITEM-${index}-CONTENT-${i}`">
-                <p class="item-content">{{ paragraph }}</p>
+        <div>
+            <span>
+                <template v-for="tag, i in item.tags" :key="`ITEM-${item.id}-TAG-${i}`">
+                <div class="item-tag" :style="`background-color: ${tag.name}`"></div>
                 </template>
-            </div>
+            </span>
 
-            <router-link class="item-edit" :to="`/edit/${index}`">
-                <fa-icon icon="fa-solid fa-pen-to-square" />
-            </router-link>
-        </span>
+            <span>
+                <div>
+                    <h3 v-if="item.name" class="item-name">{{ item.name }}</h3>
 
-        <template v-for="field, i in item.fields" :key="`ITEM-${index}-FIELD-${i}`">
-        <check-item-component
-            v-if="field.type === 'check'"
-            :field="field"
-        />
-        
-        <counter-component
-            v-if="field.type === 'count'"
-            :field="field"
-        />
-        </template>
+                    <template v-for="paragraph, i in contentParagraphs" :key="`ITEM-${item.id}-CONTENT-${i}`">
+                    <p class="item-content">{{ paragraph }}</p>
+                    </template>
+                </div>
+
+                <router-link class="item-edit" :to="`/edit/${index}`">
+                    <fa-icon icon="fa-solid fa-pen-to-square" />
+                </router-link>
+            </span>
+
+            <template v-for="field, i in item.fields" :key="`ITEM-${item.id}-FIELD-${i}`">
+            <check-item-component
+                v-if="field.type === 'check'"
+                :field="field"
+            />
+            
+            <counter-component
+                v-if="field.type === 'count'"
+                :field="field"
+            />
+            </template>
+        </div>
     </div>
 </transition>
 </template>
@@ -60,6 +64,8 @@ export default {
 <style scoped>
 
 .item-container {
+    display: flex;
+
     padding: 1em;
     border-radius: 15px;
 
@@ -124,6 +130,15 @@ export default {
         margin-top 200ms,
         margin-bottom 200ms,
         opacity 200ms;
+}
+
+.item-container > * {
+    flex: 1;
+}
+.item-container > svg {
+    flex: 0;
+    width: 20px;
+    margin-right: 20px;
 }
 
 span {

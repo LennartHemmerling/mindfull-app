@@ -2,12 +2,14 @@
 import { VueDraggableNext } from 'vue-draggable-next'
 
 import { store } from '@/store'
-
 import { addTag, addCheckItem } from '@/data'
 
 export default {
     components: {
         VueDraggableNext
+    },
+    mounted() {
+        this.editMode = false
     },
     methods: {
         addTag() {
@@ -33,6 +35,7 @@ export default {
         }
     },
     data: () => ({
+        editMode: false,
         types: ['check', 'count', 'date'],
         tagInput: "black",
         deleting: -1,
@@ -44,6 +47,9 @@ export default {
         },
         hasDateItem() {
             return this.item.fields.find(field => field.type === 'date')
+        },
+        itemWrapper() {
+            return this.editMode ? VueDraggableNext : 'div'
         }
     }
 }
@@ -51,6 +57,10 @@ export default {
 
 <template>
 <main :class="hasDateItem ? 'with-timeline' : ''">
+    <button class="fab" @click="editMode = !editMode">
+        <fa-icon :icon="`fa-solid ${editMode ? 'fa-xmark' : 'fa-up-down'}`" />
+    </button>
+
     <div class="item-container even">
         <div class="item-tags-bar top">
             <h3>tags</h3>
@@ -82,37 +92,43 @@ export default {
         <p><textarea v-model="item.content" placeholder="description.."></textarea></p>
     </div>
 
-    <vue-draggable-next v-model="item.fields">
+    <component :is="itemWrapper" v-model="item.fields">
         <template v-for="field, i in item.fields" :key="`EDIT-FIELD-${i}`">
         <transition name="field">
             <div 
                 v-if="deleting !== i" 
                 :class="`item-container ${i % 2 === 0 ? 'even' : ''} ${field.type === 'date' ? 'date' : ''} ${forbidAnimationTill > i ? 'no-animation' : ''}`"
             >
-                <div class="item-field-top-bar">
-                    <input v-model="field.name" placeholder="field">
+                <div class="item-container-content">
+                    <fa-icon v-if="editMode" icon="fa-solid fa-grip" />
 
-                    <button class="item-field-top-bar-delete-button" @click="removeField(i)">
-                        <fa-icon icon="fa-solid fa-xmark" />
-                    </button>
-                </div>
+                    <div>
+                        <div class="item-field-top-bar">
+                            <input v-model="field.name" placeholder="field">
 
-                <div v-show="field.type === 'date'" class="item-field-date-container">
-                    <input type="time" v-model="field.time">
-                    <input type="date" v-model="field.date">
-                </div>
-                
-                <div class="item-field-type-container">
-                    <template v-for="type, j in types" :key="`FIELD-${i}-TYPE-SELECT-${j}`">
-                        <button :class="`item-field-type-button ${field.type === type ? 'on' : ''}`" @click="field.type = type">
-                            {{ type }}
-                        </button>
-                    </template>   
+                            <button class="item-field-top-bar-delete-button" @click="removeField(i)">
+                                <fa-icon icon="fa-solid fa-xmark" />
+                            </button>
+                        </div>
+
+                        <div v-show="field.type === 'date'" class="item-field-date-container">
+                            <input type="time" v-model="field.time">
+                            <input type="date" v-model="field.date">
+                        </div>
+                        
+                        <div class="item-field-type-container">
+                            <template v-for="type, j in types" :key="`FIELD-${i}-TYPE-SELECT-${j}`">
+                                <button :class="`item-field-type-button ${field.type === type ? 'on' : ''}`" @click="field.type = type">
+                                    {{ type }}
+                                </button>
+                            </template>   
+                        </div>
+                    </div>
                 </div>
             </div>
         </transition>
         </template>
-    </vue-draggable-next>
+    </component>
 
     <button class="item-add-field-button" @click="addField()">
         <fa-icon icon="fa-solid fa-plus" />
@@ -276,9 +292,23 @@ main.with-timeline {
     margin-left: .5em;
 }
 
+.item-container-content {
+    display: flex;
+}
+
+.item-container-content > * {
+    flex: 1;
+}
+.item-container-content > svg {
+    flex: 0;
+    min-width: 20px;
+    padding-right: 20px;
+}
+
 .item-field-top-bar {
     display: flex;
 }
+
 .item-container input {
     width: 100%;
     background-color: #ffffff11;

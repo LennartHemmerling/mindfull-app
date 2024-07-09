@@ -12,7 +12,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import { faSquare, faSquareCheck, faSquarePlus, faSquareMinus, faPenToSquare, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faSquare, faSquareCheck, faSquarePlus, faSquareMinus, faPenToSquare, faPlus, faXmark, faGrip, faUpDown } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faSquare)
 library.add(faSquareCheck)
@@ -21,6 +21,8 @@ library.add(faSquareMinus)
 library.add(faPenToSquare)
 library.add(faPlus)
 library.add(faXmark)
+library.add(faGrip)
+library.add(faUpDown)
 
 const app = createApp(App)
 

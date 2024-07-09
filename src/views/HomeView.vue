@@ -18,6 +18,8 @@ export default {
         keepAwake()
         
         loadStore()
+
+        this.editMode = false
     },
     methods: {
         toggleTag(i) {
@@ -45,6 +47,9 @@ export default {
             return moment(`${year}-${monthString}-01`).format("MMMM YYYY")
         }
     },
+    data: () => ({
+        editMode: true
+    }),
     computed: {
         items: {
             get() {
@@ -133,6 +138,9 @@ export default {
         },
         datesAfterToday() {
             return this.dates.filter(({isAfterToday}) => isAfterToday)
+        },
+        itemWrapper() {
+            return this.editMode ? VueDraggableNext : 'div'
         }
     }
 }
@@ -140,6 +148,10 @@ export default {
 
 <template>
 <main>
+    <button class="fab" @click="editMode = !editMode">
+        <fa-icon :icon="`fa-solid ${editMode ? 'fa-xmark' : 'fa-up-down'}`" />
+    </button>
+
     <div class="tags">
         <template v-for="tag, i in tagsAvailable" :key="`TAG-${i}`">
         <button :class="isTagActive(tag) ? 'on' : ''" @click="toggleTag(i)" :style="`background-color: ${tag.name};`">
@@ -149,15 +161,16 @@ export default {
     </div>
 
     <section class="todo">
-        <vue-draggable-next v-model="items">
-            <template v-for="[item, i, visible] in items" :key="`ITEM-${i}`">
+        <component :is="itemWrapper" v-model="items">
+            <template v-for="[item, index, visible] in items" :key="`ITEM-${item.id}`">
             <item-component
                 :item="item"
-                :index="i"
+                :index="index"
                 :visible="visible"
+                :editMode="editMode"
             />
             </template>
-        </vue-draggable-next>
+        </component>
 
         <button class="add-item" @click="addItem()">
             <fa-icon icon="fa-solid fa-plus" />
