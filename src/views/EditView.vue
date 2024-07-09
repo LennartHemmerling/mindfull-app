@@ -1,9 +1,14 @@
 <script>
+import { VueDraggableNext } from 'vue-draggable-next'
+
 import { store } from '@/store'
 
 import { addTag, addCheckItem } from '@/data'
 
 export default {
+    components: {
+        VueDraggableNext
+    },
     methods: {
         addTag() {
             addTag(this.item, this.tagInput)
@@ -77,35 +82,37 @@ export default {
         <p><textarea v-model="item.content" placeholder="description.."></textarea></p>
     </div>
 
-    <template v-for="field, i in item.fields" :key="`EDIT-FIELD-${i}`">
-    <transition name="field">
-        <div 
-            v-if="deleting !== i" 
-            :class="`item-container ${i % 2 === 0 ? 'even' : ''} ${field.type === 'date' ? 'date' : ''} ${forbidAnimationTill > i ? 'no-animation' : ''}`"
-        >
-            <div class="item-field-top-bar">
-                <input v-model="field.name" placeholder="field">
+    <vue-draggable-next v-model="item.fields">
+        <template v-for="field, i in item.fields" :key="`EDIT-FIELD-${i}`">
+        <transition name="field">
+            <div 
+                v-if="deleting !== i" 
+                :class="`item-container ${i % 2 === 0 ? 'even' : ''} ${field.type === 'date' ? 'date' : ''} ${forbidAnimationTill > i ? 'no-animation' : ''}`"
+            >
+                <div class="item-field-top-bar">
+                    <input v-model="field.name" placeholder="field">
 
-                <button class="item-field-top-bar-delete-button" @click="removeField(i)">
-                    <fa-icon icon="fa-solid fa-xmark" />
-                </button>
-            </div>
-
-            <div v-show="field.type === 'date'" class="item-field-date-container">
-                <input type="time" v-model="field.time">
-                <input type="date" v-model="field.date">
-            </div>
-            
-            <div class="item-field-type-container">
-                <template v-for="type, j in types" :key="`FIELD-${i}-TYPE-SELECT-${j}`">
-                    <button :class="`item-field-type-button ${field.type === type ? 'on' : ''}`" @click="field.type = type">
-                        {{ type }}
+                    <button class="item-field-top-bar-delete-button" @click="removeField(i)">
+                        <fa-icon icon="fa-solid fa-xmark" />
                     </button>
-                </template>   
+                </div>
+
+                <div v-show="field.type === 'date'" class="item-field-date-container">
+                    <input type="time" v-model="field.time">
+                    <input type="date" v-model="field.date">
+                </div>
+                
+                <div class="item-field-type-container">
+                    <template v-for="type, j in types" :key="`FIELD-${i}-TYPE-SELECT-${j}`">
+                        <button :class="`item-field-type-button ${field.type === type ? 'on' : ''}`" @click="field.type = type">
+                            {{ type }}
+                        </button>
+                    </template>   
+                </div>
             </div>
-        </div>
-    </transition>
-    </template>
+        </transition>
+        </template>
+    </vue-draggable-next>
 
     <button class="item-add-field-button" @click="addField()">
         <fa-icon icon="fa-solid fa-plus" />

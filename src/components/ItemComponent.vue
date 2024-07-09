@@ -21,7 +21,7 @@ export default {
 
 <template>
 <transition name="item">
-    <div v-if="visible" :class="itemContainerStyle">
+    <div v-show="visible" :class="itemContainerStyle">
         <span>
             <template v-for="tag, i in item.tags" :key="`ITEM-${index}-TAG-${i}`">
             <div class="item-tag" :style="`background-color: ${tag.name}`"></div>

@@ -1,5 +1,7 @@
 <script>
 import moment from 'moment'
+import { VueDraggableNext } from 'vue-draggable-next'
+
 import ItemComponent from '@/components/ItemComponent.vue'
 import DateComponent from '@/components/fields/DateComponent.vue'
 import { store, loadStore } from '@/store'
@@ -8,6 +10,7 @@ import { keepAwake } from '@/native'
 
 export default {
     components: {
+        VueDraggableNext,
         ItemComponent,
         DateComponent
     },
@@ -43,16 +46,22 @@ export default {
         }
     },
     computed: {
-        items() {
-            const items = store.items.map((item, index) => [item, index])
-            if(store.tagsActive.length > 0) {
-                return items.map(item => {
-                    const visible = item[0].tags.reduce((all, tag1) => {
-                        return all || store.tagsActive.find(tag2 => tagsEqual(tag1, tag2))
-                    }, false)
-                    return [...item, visible]
-                })
-            }else return items.map(item => [...item, true])
+        items: {
+            get() {
+                const items = store.items.map((item, index) => [item, index])
+                if(store.tagsActive.length > 0) {
+                    return items.map(item => {
+                        const visible = item[0].tags.reduce((all, tag1) => {
+                            return all || store.tagsActive.find(tag2 => tagsEqual(tag1, tag2))
+                        }, false)
+                        return [...item, visible]
+                    })
+                }else return items.map(item => [...item, true])    
+            },
+            set(val) {
+                const items = val.map(([item]) => item)
+                store.items = items
+            }
         },
         tagsAvailable() {
             return store.items.reduce((all, cur) => {
@@ -140,13 +149,15 @@ export default {
     </div>
 
     <section class="todo">
-        <template v-for="[item, i, visible] in items" :key="`ITEM-${i}`">
-        <item-component
-            :item="item"
-            :index="i"
-            :visible="visible"
-        />
-        </template>
+        <vue-draggable-next v-model="items">
+            <template v-for="[item, i, visible] in items" :key="`ITEM-${i}`">
+            <item-component
+                :item="item"
+                :index="i"
+                :visible="visible"
+            />
+            </template>
+        </vue-draggable-next>
 
         <button class="add-item" @click="addItem()">
             <fa-icon icon="fa-solid fa-plus" />
