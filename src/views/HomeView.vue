@@ -40,11 +40,6 @@ export default {
         getDateString(month, year) {
             const monthString = month > 9 ? `${month}` : `0${month}`
             return moment(`${year}-${monthString}-01`).format("MMMM YYYY")
-        },
-        isCategoryVisible({month, year, isToday, visible}, index) {
-            return visible 
-                && (index < 2 || isToday || this.dates[index - 1].visible 
-                || (this.dates[index - 2].month !== month || this.dates[index - 2].year !== year))
         }
     },
     computed: {
@@ -89,6 +84,9 @@ export default {
                     today.getMonth() + 1 === month 
                     && today.getFullYear() === year
                     && today.getDate() === date.getDate()
+                const isBeforeToday = !isToday 
+                    && (today.getTime() > date.getTime())
+                const isAfterToday = !isToday && !isBeforeToday
 
                 if(
                     all.length > 0 
@@ -100,12 +98,13 @@ export default {
                         !isToday && !all[all.length - 1].isToday
                         && all[all.length - 1].month === month 
                         && all[all.length - 1].year === year
+                        && all[all.length -1].isBeforeToday === isBeforeToday
                     )
                 ) {
                     all[all.length - 1].dates.push(cur)
                 }else {
                     const category = {
-                        month, year, isToday,
+                        month, year, isToday, isBeforeToday, isAfterToday,
                         dates: [cur]
                     }
                     all.push(category)
@@ -116,6 +115,15 @@ export default {
                 ...category,
                 visible: category.dates.reduce((all, cur) => all || cur[3], false)
             }))
+        },
+        datesBeforeToday() {
+            return this.dates.filter(({isBeforeToday}) => isBeforeToday)
+        },
+        dateToday() {
+            return this.dates.find(({isToday}) => isToday)
+        },
+        datesAfterToday() {
+            return this.dates.filter(({isAfterToday}) => isAfterToday)
         }
     }
 }
@@ -146,10 +154,45 @@ export default {
     </section>
 
     <section class="timeline">
-        <template v-for="category, h in dates" :key="`DATES-${h}`">
+        <template v-for="category, h in datesBeforeToday" :key="`DATES-${h}`">
         <transition name="date-category">
-            <div>
-                <h2 v-if="isCategoryVisible(category, h)">{{ category.isToday ? 'Today' : getDateString(category.month, category.year) }}</h2>
+            <div v-if="category.dates.find(date => date[3])">
+                <h2>{{ getDateString(category.month, category.year) }}</h2>
+            </div>
+        </transition>
+
+        <template v-for="[item, field, i, visible], j in category.dates" :key="`DATES-${h}-DATE-${j}-ITEM-${i}`">
+        <date-component
+            :item="item"
+            :field="field"
+            :itemIndex="i"
+            :index="j"
+            :visible="visible"
+        />
+        </template>
+        </template>
+
+        <div class="category-today">
+            <h2>Today</h2>
+
+            <template v-for="[item, field, i, visible], j in dateToday.dates" :key="`DATES-${h}-DATE-${j}-ITEM-${i}`">
+            <date-component
+                :item="item"
+                :field="field"
+                :itemIndex="i"
+                :index="j"
+                :visible="visible"
+            />
+            </template>
+            <p v-if="!dateToday" class="nothing-text"><i>nothing to do..</i></p>
+            <p v-else-if="!dateToday.dates.find(date => date[3])" class="nothing-text"><i>nothing to see..</i></p>
+
+        </div>
+
+        <template v-for="category, h in datesAfterToday" :key="`DATES-${h}`">
+        <transition name="date-category">
+            <div v-if="category.dates.find(date => date[3])">
+                <h2>{{ getDateString(category.month, category.year) }}</h2>
             </div>
         </transition>
 
@@ -264,7 +307,7 @@ section.todo .add-item svg {
 }
 
 section.timeline {
-    padding: 1em 0 1em 1em; 
+    padding: 1em 0 1em calc(35px + 1em); 
 
     border-right: solid 3px var(--color-3);
 }
@@ -274,9 +317,27 @@ section.timeline h2 {
     margin-right: 1em;
 }
 
-section.timeline .hidden-text {
-    text-align: right;
-    margin-right: 2em;
+section.timeline .category-today {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+
+    border: dashed 2px var(--text-1);
+    border-right: none;
+
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+section.timeline .category-today h2 {
+    text-align: left;
+    margin-right: 0;
+    margin-left: 1em;
+    margin-top: 1em;
+}
+
+section.timeline .category-today .nothing-text {
+    margin-left: 2em;
+    margin-bottom: 2em;
 }
 
 .date-category-enter-to, .date-category-leave-from {

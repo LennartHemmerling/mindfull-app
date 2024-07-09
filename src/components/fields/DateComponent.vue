@@ -26,8 +26,8 @@ export default {
 <style scoped>
 
 .date-container {
-    margin-left:  30px;
-
+    margin-left: 1em;
+    
     margin-bottom: 1em;
 
     padding: 1em;
