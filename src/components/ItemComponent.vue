@@ -35,8 +35,10 @@ export default {
                 <div>
                     <h3 v-if="item.name" class="item-name">{{ item.name }}</h3>
 
+                    <template v-if="!editMode">
                     <template v-for="paragraph, i in contentParagraphs" :key="`ITEM-${item.id}-CONTENT-${i}`">
                     <p class="item-content">{{ paragraph }}</p>
+                    </template>
                     </template>
                 </div>
 
@@ -45,6 +47,7 @@ export default {
                 </router-link>
             </span>
 
+            <template v-if="!editMode">
             <template v-for="field, i in item.fields" :key="`ITEM-${item.id}-FIELD-${i}`">
             <check-item-component
                 v-if="field.type === 'check'"
@@ -55,6 +58,7 @@ export default {
                 v-if="field.type === 'count'"
                 :field="field"
             />
+            </template>
             </template>
         </div>
     </div>
@@ -159,12 +163,6 @@ span {
 }
 .item-tag:last-child {
     margin-right: 0;
-}
-
-.item-name {
-}
-.item-content {
-
 }
 .item-edit {
     font-size: 20px;

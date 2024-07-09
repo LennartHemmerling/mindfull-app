@@ -102,7 +102,7 @@ export default {
                 <div class="item-container-content">
                     <fa-icon v-if="editMode" icon="fa-solid fa-grip" />
 
-                    <div>
+                    <div v-if="!editMode">
                         <div class="item-field-top-bar">
                             <input v-model="field.name" placeholder="field">
 
@@ -123,6 +123,10 @@ export default {
                                 </button>
                             </template>   
                         </div>
+                    </div>
+
+                    <div v-else>
+                        <p>{{ field.name }}</p>
                     </div>
                 </div>
             </div>
@@ -360,9 +364,6 @@ main.with-timeline {
 }
 .item-field-date-container > *:last-child {
     margin-right: 0;
-}
-.item-field-type-container {
-
 }
 .item-field-type-button {
     padding: .5em;
