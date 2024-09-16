@@ -1,4 +1,4 @@
-import { MindfullField, MindfullItem, MindfullTag } from 'mindfull-types'
+import type { MindfullField, MindfullItem, MindfullTag } from 'mindfull-types'
 
 export function createItem(): MindfullItem {
     return {

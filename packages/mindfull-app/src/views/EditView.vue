@@ -16,28 +16,31 @@ export default {
             addTag(this.item, this.tagInput)
         },
         removeTag(index) {
-            this.item.tags = [...this.item.tags.slice(0, index), ...this.item.tags.slice(index + 1)]
+            this.item.tags = [
+                ...this.item.tags.slice(0, index),
+                ...this.item.tags.slice(index + 1)
+            ]
         },
         addField() {
             addCheckItem(this.item)
         },
         removeField(index) {
             this.deleting = index
-            setTimeout(
-                () => {
-                    this.item.fields = [...this.item.fields.slice(0, index), ...this.item.fields.slice(index + 1)]
+            setTimeout(() => {
+                this.item.fields = [
+                    ...this.item.fields.slice(0, index),
+                    ...this.item.fields.slice(index + 1)
+                ]
 
-                    this.deleting = -1
-                    this.forbidAnimationTill = this.item.fields.length
-                },
-                300
-            )
+                this.deleting = -1
+                this.forbidAnimationTill = this.item.fields.length
+            }, 300)
         }
     },
     data: () => ({
         editMode: false,
         types: ['check', 'count', 'date'],
-        tagInput: "black",
+        tagInput: 'black',
         deleting: -1,
         forbidAnimationTill: -1
     }),
@@ -46,7 +49,7 @@ export default {
             return store.items[this.$route.params['index']]
         },
         hasDateItem() {
-            return this.item.fields.find(field => field.type === 'date')
+            return this.item.fields.find((field) => field.type === 'date')
         },
         itemWrapper() {
             return this.editMode ? VueDraggableNext : 'div'
@@ -56,92 +59,127 @@ export default {
 </script>
 
 <template>
-<main :class="hasDateItem ? 'with-timeline' : ''">
-    <button class="fab" @click="editMode = !editMode">
-        <fa-icon :icon="`fa-solid ${editMode ? 'fa-xmark' : 'fa-up-down'}`" />
-    </button>
+    <main :class="hasDateItem ? 'with-timeline' : ''">
+        <button class="fab" @click="editMode = !editMode">
+            <fa-icon
+                :icon="`fa-solid ${editMode ? 'fa-xmark' : 'fa-up-down'}`"
+            />
+        </button>
 
-    <div class="item-container even">
-        <div class="item-tags-bar top">
-            <h3>tags</h3>
-            <p>
-                <template v-for="tag, i in item.tags" :key="`TAG-${i}`">
-                <button @click="removeTag(i)" :style="`background-color: ${tag.name};`">
-                    {{ tag.name }}
+        <div class="item-container even">
+            <div class="item-tags-bar top">
+                <h3>tags</h3>
+                <p>
+                    <template v-for="(tag, i) in item.tags" :key="`TAG-${i}`">
+                        <button
+                            @click="removeTag(i)"
+                            :style="`background-color: ${tag.name};`"
+                        >
+                            {{ tag.name }}
 
-                    <fa-icon icon="fa-solid fa-xmark" />
+                            <fa-icon icon="fa-solid fa-xmark" />
+                        </button>
+                    </template>
+                </p>
+            </div>
+
+            <div class="item-tags-bar">
+                <input class="color-input" type="color" v-model="tagInput" />
+
+                <input v-model="tagInput" />
+
+                <button
+                    class="add-button"
+                    @click="addTag()"
+                    :disabled="!tagInput"
+                >
+                    <fa-icon icon="fa-solid fa-plus" />
                 </button>
-                </template>
+            </div>
+        </div>
+
+        <div class="item-container">
+            <h3><input v-model="item.name" placeholder="title" /></h3>
+
+            <p>
+                <textarea
+                    v-model="item.content"
+                    placeholder="description.."
+                ></textarea>
             </p>
         </div>
 
-        <div class="item-tags-bar">
-            <input class="color-input" type="color" v-model="tagInput">
-
-            <input v-model="tagInput">
-
-            <button class="add-button" @click="addTag()" :disabled="!tagInput">
-                <fa-icon icon="fa-solid fa-plus" />
-            </button>
-        </div>
-    </div>
-
-    <div class="item-container">
-        <h3><input v-model="item.name" placeholder="title"></h3>
-
-        <p><textarea v-model="item.content" placeholder="description.."></textarea></p>
-    </div>
-
-    <component :is="itemWrapper" v-model="item.fields">
-        <template v-for="field, i in item.fields" :key="`EDIT-FIELD-${i}`">
-        <transition name="field">
-            <div 
-                v-if="deleting !== i" 
-                :class="`item-container ${i % 2 === 0 ? 'even' : ''} ${field.type === 'date' ? 'date' : ''} ${forbidAnimationTill > i ? 'no-animation' : ''}`"
+        <component :is="itemWrapper" v-model="item.fields">
+            <template
+                v-for="(field, i) in item.fields"
+                :key="`EDIT-FIELD-${i}`"
             >
-                <div class="item-container-content">
-                    <fa-icon v-if="editMode" icon="fa-solid fa-grip" />
+                <transition name="field">
+                    <div
+                        v-if="deleting !== i"
+                        :class="`item-container ${i % 2 === 0 ? 'even' : ''} ${
+                            field.type === 'date' ? 'date' : ''
+                        } ${forbidAnimationTill > i ? 'no-animation' : ''}`"
+                    >
+                        <div class="item-container-content">
+                            <fa-icon v-if="editMode" icon="fa-solid fa-grip" />
 
-                    <div v-if="!editMode">
-                        <div class="item-field-top-bar">
-                            <input v-model="field.name" placeholder="field">
+                            <div v-if="!editMode">
+                                <div class="item-field-top-bar">
+                                    <input
+                                        v-model="field.name"
+                                        placeholder="field"
+                                    />
 
-                            <button class="item-field-top-bar-delete-button" @click="removeField(i)">
-                                <fa-icon icon="fa-solid fa-xmark" />
-                            </button>
-                        </div>
+                                    <button
+                                        class="item-field-top-bar-delete-button"
+                                        @click="removeField(i)"
+                                    >
+                                        <fa-icon icon="fa-solid fa-xmark" />
+                                    </button>
+                                </div>
 
-                        <div v-show="field.type === 'date'" class="item-field-date-container">
-                            <input type="time" v-model="field.time">
-                            <input type="date" v-model="field.date">
-                        </div>
-                        
-                        <div class="item-field-type-container">
-                            <template v-for="type, j in types" :key="`FIELD-${i}-TYPE-SELECT-${j}`">
-                                <button :class="`item-field-type-button ${field.type === type ? 'on' : ''}`" @click="field.type = type">
-                                    {{ type }}
-                                </button>
-                            </template>   
+                                <div
+                                    v-show="field.type === 'date'"
+                                    class="item-field-date-container"
+                                >
+                                    <input type="time" v-model="field.time" />
+                                    <input type="date" v-model="field.date" />
+                                </div>
+
+                                <div class="item-field-type-container">
+                                    <template
+                                        v-for="(type, j) in types"
+                                        :key="`FIELD-${i}-TYPE-SELECT-${j}`"
+                                    >
+                                        <button
+                                            :class="`item-field-type-button ${
+                                                field.type === type ? 'on' : ''
+                                            }`"
+                                            @click="field.type = type"
+                                        >
+                                            {{ type }}
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div v-else>
+                                <p>{{ field.name }}</p>
+                            </div>
                         </div>
                     </div>
+                </transition>
+            </template>
+        </component>
 
-                    <div v-else>
-                        <p>{{ field.name }}</p>
-                    </div>
-                </div>
-            </div>
-        </transition>
-        </template>
-    </component>
-
-    <button class="item-add-field-button" @click="addField()">
-        <fa-icon icon="fa-solid fa-plus" />
-    </button>
-</main>
+        <button class="item-add-field-button" @click="addField()">
+            <fa-icon icon="fa-solid fa-plus" />
+        </button>
+    </main>
 </template>
 
 <style scoped>
-
 main {
     padding-top: 1em;
 
@@ -171,16 +209,12 @@ main.with-timeline {
 
     background-color: var(--color-1);
 
-    animation: item-container-spawn-animation-left .4s ease-out;
+    animation: item-container-spawn-animation-left 0.4s ease-out;
 
-    transition: 
-        margin 200ms,
-        border-radius 300ms,
-        background-color 200ms;
-
+    transition: margin 200ms, border-radius 300ms, background-color 200ms;
 }
 .item-container.even {
-    animation: item-container-spawn-animation-right .4s ease-out;
+    animation: item-container-spawn-animation-right 0.4s ease-out;
 }
 .item-container.no-animation {
     animation: unset;
@@ -236,13 +270,8 @@ main.with-timeline {
 }
 .field-leave-active {
     overflow: clip;
-    transition: 
-        max-height 200ms,
-        padding-top 200ms,
-        padding-bottom 200ms,
-        margin-top 200ms,
-        margin-bottom 200ms,
-        opacity 200ms;
+    transition: max-height 200ms, padding-top 200ms, padding-bottom 200ms,
+        margin-top 200ms, margin-bottom 200ms, opacity 200ms;
 }
 
 .item-tags-bar {
@@ -269,9 +298,7 @@ main.with-timeline {
     justify-content: center;
     align-items: center;
 
-    transition: 
-        outline 500ms,
-        background-color 200ms;
+    transition: outline 500ms, background-color 200ms;
 }
 .item-tags-bar .add-button:disabled {
     background-color: #ffffff11;
@@ -285,7 +312,7 @@ main.with-timeline {
 }
 .item-tags-bar.top button {
     margin-left: 1em;
-    padding: .5em;
+    padding: 0.5em;
 
     border: none;
     border-radius: 5px;
@@ -293,7 +320,7 @@ main.with-timeline {
     color: var(--text-1);
 }
 .item-tags-bar.top svg {
-    margin-left: .5em;
+    margin-left: 0.5em;
 }
 
 .item-container-content {
@@ -319,7 +346,7 @@ main.with-timeline {
     color: var(--text-1);
     border: none;
     border-radius: 5px;
-    padding: .5em;
+    padding: 0.5em;
 }
 .item-container h3 input {
     font-size: 17px;
@@ -331,7 +358,7 @@ main.with-timeline {
     color: var(--text-1);
     border: none;
     border-radius: 5px;
-    padding: .5em;
+    padding: 0.5em;
     margin-top: 1em;
 }
 .item-field-top-bar-delete-button {
@@ -356,8 +383,8 @@ main.with-timeline {
     display: flex;
 }
 .item-field-date-container > * {
-    margin-right: .5em;
-    margin-left: .5em;
+    margin-right: 0.5em;
+    margin-left: 0.5em;
 }
 .item-field-date-container > *:first-child {
     margin-left: 0;
@@ -366,12 +393,12 @@ main.with-timeline {
     margin-right: 0;
 }
 .item-field-type-button {
-    padding: .5em;
+    padding: 0.5em;
 
     margin-top: 1em;
 
-    margin-left: .5em;
-    margin-right: .5em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
 
     background-color: #ffffff11;
     color: var(--text-1);
@@ -396,7 +423,7 @@ main.with-timeline {
     background-color: var(--color-1);
     border: none;
     border-radius: 15px;
-    padding: .5em;
+    padding: 0.5em;
     margin-left: 1em;
     margin-right: calc(1em - 3px);
 
@@ -423,5 +450,4 @@ main.with-timeline {
     font-size: 20px;
     color: var(--text-1);
 }
-
 </style>
