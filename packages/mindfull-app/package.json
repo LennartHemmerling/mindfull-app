@@ -1,0 +1,34 @@
+{
+  "name": "mindfull-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "cap": "bun x cap update && bun x cap sync",
+    "build": "vite build",
+    "android": "bun run build && bun x cap run android --target Pixel_3a_API_34_extension_level_7_x86_64",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "mindfull-types": "*",
+    "@capacitor-community/keep-awake": "^5.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-regular-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
+    "moment": "^2.30.1",
+    "vue": "^3.4.21",
+    "vue-draggable-next": "^2.2.1",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.8"
+  }
+}

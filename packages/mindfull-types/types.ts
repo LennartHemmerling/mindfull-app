@@ -1,12 +1,22 @@
+// Username in server
+export type Username = string
+// Password in server
+export type Password = string
+// Session token in server
+export type Token = {
+    token: string
+    date: number
+}
+
 // The item
 export type MindfullItem = {
-    id: number,
+    id: number
     // Items have names
     name: string
     // And text
     content: string
     // And tags for filtering
-    tags: MindfullTag[],
+    tags: MindfullTag[]
     // And multiple instances of objects
     fields: MindfullField[]
 }
@@ -16,7 +26,7 @@ export type MindfullTag = {
     // Who created a tag (or undefined for local)
     origin?: {
         server: string
-        user: string
+        user: Username
     }
     // What is it called
     name: string
@@ -24,7 +34,7 @@ export type MindfullTag = {
 
 // Most objects are fields, so they can be mutated into each other
 export type MindfullField = {
-    id: number,
+    id: number
     // They have a name
     name: string
     // And a value (0/1 bool, --0++ count, timestamp, etc)
