@@ -19,7 +19,6 @@ export function withAuth(
     password: Password,
     fn: (err: string | null, success: boolean | null) => void
 ) {
-    return fn(null, true)
     // Login user
     // Get salt and hash
     const salt = ''
