@@ -7,66 +7,81 @@ export default {
         CheckItemComponent,
         CounterComponent
     },
-    props: ["item", "index", "visible", "editMode"],
+    props: ['item', 'index', 'visible', 'editMode'],
     computed: {
         itemContainerStyle() {
-            return this.index % 2 === 0 ? "item-container even" : "item-container"
+            return this.index % 2 === 0
+                ? 'item-container even'
+                : 'item-container'
         },
         contentParagraphs() {
-            return this.item.content.split("\n")
+            return this.item.content.split('\n')
         }
     }
 }
 </script>
 
 <template>
-<transition name="item">
-    <div v-show="visible" :class="itemContainerStyle">
-        <fa-icon v-if="editMode" icon="fa-icon fa-grip" />
+    <transition name="item">
+        <div v-show="visible" :class="itemContainerStyle">
+            <fa-icon v-if="editMode" icon="fa-icon fa-grip" />
 
-        <div>
-            <span>
-                <template v-for="tag, i in item.tags" :key="`ITEM-${item.id}-TAG-${i}`">
-                <div class="item-tag" :style="`background-color: ${tag.name}`"></div>
+            <div>
+                <span>
+                    <template
+                        v-for="(tag, i) in item.tags"
+                        :key="`ITEM-${item.id}-TAG-${i}`"
+                    >
+                        <div
+                            class="item-tag"
+                            :style="`background-color: ${tag.name}`"
+                        ></div>
+                    </template>
+                </span>
+
+                <span>
+                    <div>
+                        <h3 v-if="item.name" class="item-name">
+                            {{ item.name }}
+                        </h3>
+
+                        <template v-if="!editMode">
+                            <template
+                                v-for="(paragraph, i) in contentParagraphs"
+                                :key="`ITEM-${item.id}-CONTENT-${i}`"
+                            >
+                                <p class="item-content">{{ paragraph }}</p>
+                            </template>
+                        </template>
+                    </div>
+
+                    <router-link class="item-edit" :to="`/edit/${index}`">
+                        <fa-icon icon="fa-solid fa-pen-to-square" />
+                    </router-link>
+                </span>
+
+                <template v-if="!editMode">
+                    <template
+                        v-for="(field, i) in item.fields"
+                        :key="`ITEM-${item.id}-FIELD-${i}`"
+                    >
+                        <check-item-component
+                            v-if="field.type === 'check'"
+                            :field="field"
+                        />
+
+                        <counter-component
+                            v-if="field.type === 'count'"
+                            :field="field"
+                        />
+                    </template>
                 </template>
-            </span>
-
-            <span>
-                <div>
-                    <h3 v-if="item.name" class="item-name">{{ item.name }}</h3>
-
-                    <template v-if="!editMode">
-                    <template v-for="paragraph, i in contentParagraphs" :key="`ITEM-${item.id}-CONTENT-${i}`">
-                    <p class="item-content">{{ paragraph }}</p>
-                    </template>
-                    </template>
-                </div>
-
-                <router-link class="item-edit" :to="`/edit/${index}`">
-                    <fa-icon icon="fa-solid fa-pen-to-square" />
-                </router-link>
-            </span>
-
-            <template v-if="!editMode">
-            <template v-for="field, i in item.fields" :key="`ITEM-${item.id}-FIELD-${i}`">
-            <check-item-component
-                v-if="field.type === 'check'"
-                :field="field"
-            />
-            
-            <counter-component
-                v-if="field.type === 'count'"
-                :field="field"
-            />
-            </template>
-            </template>
+            </div>
         </div>
-    </div>
-</transition>
+    </transition>
 </template>
 
 <style scoped>
-
 .item-container {
     display: flex;
 
@@ -78,10 +93,10 @@ export default {
     margin-bottom: 1em;
     margin-left: 30px;
 
-    animation: item-container-spawn-animation-left .4s ease-out;
+    animation: item-container-spawn-animation-left 0.4s ease-out;
 }
 .item-container.even {
-    animation: item-container-spawn-animation-right .4s ease-out;
+    animation: item-container-spawn-animation-right 0.4s ease-out;
 }
 
 @keyframes item-container-spawn-animation-left {
@@ -127,7 +142,7 @@ export default {
 }
 .item-leave-active {
     overflow: clip;
-    transition: 
+    transition:
         max-height 200ms,
         padding-top 200ms,
         padding-bottom 200ms,
@@ -153,9 +168,9 @@ span {
 .item-tag {
     flex: 1;
     height: 10px;
-    margin-left: .25em;
-    margin-right: .25em;
-    margin-bottom: .5em;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+    margin-bottom: 0.5em;
     border-radius: 15px;
 }
 .item-tag:first-child {
@@ -168,5 +183,4 @@ span {
     font-size: 20px;
     color: var(--text-1);
 }
-
 </style>

@@ -211,7 +211,10 @@ main.with-timeline {
 
     animation: item-container-spawn-animation-left 0.4s ease-out;
 
-    transition: margin 200ms, border-radius 300ms, background-color 200ms;
+    transition:
+        margin 200ms,
+        border-radius 300ms,
+        background-color 200ms;
 }
 .item-container.even {
     animation: item-container-spawn-animation-right 0.4s ease-out;
@@ -270,8 +273,13 @@ main.with-timeline {
 }
 .field-leave-active {
     overflow: clip;
-    transition: max-height 200ms, padding-top 200ms, padding-bottom 200ms,
-        margin-top 200ms, margin-bottom 200ms, opacity 200ms;
+    transition:
+        max-height 200ms,
+        padding-top 200ms,
+        padding-bottom 200ms,
+        margin-top 200ms,
+        margin-bottom 200ms,
+        opacity 200ms;
 }
 
 .item-tags-bar {
@@ -298,7 +306,9 @@ main.with-timeline {
     justify-content: center;
     align-items: center;
 
-    transition: outline 500ms, background-color 200ms;
+    transition:
+        outline 500ms,
+        background-color 200ms;
 }
 .item-tags-bar .add-button:disabled {
     background-color: #ffffff11;

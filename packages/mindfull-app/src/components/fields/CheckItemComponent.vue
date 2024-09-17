@@ -1,7 +1,6 @@
 <script>
-
 export default {
-    props: ["field"],
+    props: ['field'],
     methods: {
         toggle() {
             this.field.value = this.isChecked ? 0 : 1
@@ -17,23 +16,24 @@ export default {
 </script>
 
 <template>
-<div class="item-check">
-    <button @click="toggle()">
-        <fa-icon :icon="`fa-solid ${isChecked ? 'fa-square-check' : 'fa-square'}`" />
+    <div class="item-check">
+        <button @click="toggle()">
+            <fa-icon
+                :icon="`fa-solid ${isChecked ? 'fa-square-check' : 'fa-square'}`"
+            />
 
-        <p>{{ field.name }}</p>
-    </button>
-</div>
+            <p>{{ field.name }}</p>
+        </button>
+    </div>
 </template>
 
 <style scoped>
-
 .item-check {
     margin-top: 1em;
 }
 .item-check button {
     width: 100%;
-    
+
     display: flex;
     align-items: center;
 
@@ -60,5 +60,4 @@ export default {
     text-align: left;
     font-size: 17px;
 }
-
 </style>

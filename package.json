@@ -1,11 +1,13 @@
 {
   "name": "mindfull",
-  "module": "index.ts",
-  "type": "module",
   "workspaces": ["packages/*"],
   "scripts": {
+    "prettier:all": "cd packages && prettier --write \"**/*.vue\" && prettier --write \"**/*.js\" && prettier --write \"**/*.ts\" && prettier --write \"**/*.css\"",
     "dev": "cd ./packages/mindfull-app/ && bun run dev",
     "server:dev": "cd ./packages/mindfull-server && bun run dev",
     "server": "cd ./packages/mindfull-server && bun start"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
   }
 }

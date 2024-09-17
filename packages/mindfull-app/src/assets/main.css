@@ -1,26 +1,21 @@
 @import './base.css';
 
-
 * {
-    --color-1: #4B4E6C;
-    --color-2: #6E7189;
+    --color-1: #4b4e6c;
+    --color-2: #6e7189;
 
-    --color-3: #BD6558;
+    --color-3: #bd6558;
 
-    --color-red: #C52943;
-    --color-green: #4C967D;
+    --color-red: #c52943;
+    --color-green: #4c967d;
 
     --text-1: #fdfdfd;
 }
-
-
 
 #app {
     height: 100dvh;
     width: 100vw;
 }
-
-
 
 button.fab {
     z-index: 1000;
@@ -39,7 +34,9 @@ button.fab {
     background-color: var(--text-1);
     color: var(--color-1);
 
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow:
+        0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 button.fab svg {

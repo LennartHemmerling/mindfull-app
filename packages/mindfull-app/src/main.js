@@ -12,7 +12,17 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 /* import font awesome icon component */
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import { faSquare, faSquareCheck, faSquarePlus, faSquareMinus, faPenToSquare, faPlus, faXmark, faGrip, faUpDown } from '@fortawesome/free-solid-svg-icons'
+import {
+    faSquare,
+    faSquareCheck,
+    faSquarePlus,
+    faSquareMinus,
+    faPenToSquare,
+    faPlus,
+    faXmark,
+    faGrip,
+    faUpDown
+} from '@fortawesome/free-solid-svg-icons'
 
 library.add(faSquare)
 library.add(faSquareCheck)
@@ -26,9 +36,8 @@ library.add(faUpDown)
 
 const app = createApp(App)
 
-
-CapacitorApp.addListener('backButton', ({canGoBack}) => {
-    if(!canGoBack){
+CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+    if (!canGoBack) {
         CapacitorApp.exitApp()
     } else {
         window.history.back()

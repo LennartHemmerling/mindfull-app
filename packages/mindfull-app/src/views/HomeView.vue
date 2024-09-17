@@ -16,22 +16,29 @@ export default {
     },
     mounted() {
         keepAwake()
-        
+
         loadStore()
 
         this.editMode = false
     },
     methods: {
         toggleTag(i) {
-            const tagIndex = store.tagsActive.indexOf(store.tagsActive.find(tag => tagsEqual(tag, this.tagsAvailable[i])))
-            if(tagIndex > -1) {
-                store.tagsActive = [...store.tagsActive.slice(0, tagIndex), ...store.tagsActive.slice(tagIndex + 1)]
-            }else {
+            const tagIndex = store.tagsActive.indexOf(
+                store.tagsActive.find((tag) =>
+                    tagsEqual(tag, this.tagsAvailable[i])
+                )
+            )
+            if (tagIndex > -1) {
+                store.tagsActive = [
+                    ...store.tagsActive.slice(0, tagIndex),
+                    ...store.tagsActive.slice(tagIndex + 1)
+                ]
+            } else {
                 store.tagsActive.push(this.tagsAvailable[i])
             }
         },
         isTagActive(tag) {
-            return store.tagsActive.find(tag1 => tagsEqual(tag, tag1))
+            return store.tagsActive.find((tag1) => tagsEqual(tag, tag1))
         },
         addItem() {
             const item = createItem()
@@ -44,7 +51,7 @@ export default {
         },
         getDateString(month, year) {
             const monthString = month > 9 ? `${month}` : `0${month}`
-            return moment(`${year}-${monthString}-01`).format("MMMM YYYY")
+            return moment(`${year}-${monthString}-01`).format('MMMM YYYY')
         }
     },
     data: () => ({
@@ -54,14 +61,19 @@ export default {
         items: {
             get() {
                 const items = store.items.map((item, index) => [item, index])
-                if(store.tagsActive.length > 0) {
-                    return items.map(item => {
+                if (store.tagsActive.length > 0) {
+                    return items.map((item) => {
                         const visible = item[0].tags.reduce((all, tag1) => {
-                            return all || store.tagsActive.find(tag2 => tagsEqual(tag1, tag2))
+                            return (
+                                all ||
+                                store.tagsActive.find((tag2) =>
+                                    tagsEqual(tag1, tag2)
+                                )
+                            )
                         }, false)
                         return [...item, visible]
                     })
-                }else return items.map(item => [...item, true])    
+                } else return items.map((item) => [...item, true])
             },
             set(val) {
                 const items = val.map(([item]) => item)
@@ -70,74 +82,87 @@ export default {
         },
         tagsAvailable() {
             return store.items.reduce((all, cur) => {
-                cur.tags.forEach(tag1 => {
-                    if(!all.find(tag2 => tagsEqual(tag1, tag2))) all.push(tag1)
+                cur.tags.forEach((tag1) => {
+                    if (!all.find((tag2) => tagsEqual(tag1, tag2)))
+                        all.push(tag1)
                 })
 
                 return all
             }, [])
         },
         dates() {
-            return this.items.reduce((all, cur) => {
-                const datesOfItem = cur[0].fields.reduce((all, cur) => {
-                    if(cur.type === 'date') all.push(cur)
+            return this.items
+                .reduce((all, cur) => {
+                    const datesOfItem = cur[0].fields
+                        .reduce((all, cur) => {
+                            if (cur.type === 'date') all.push(cur)
+                            return all
+                        }, [])
+                        .map((d) => [cur[0], d, cur[1], cur[2]])
+
+                    all.push(...datesOfItem)
                     return all
                 }, [])
-                .map(d => [cur[0], d, cur[1], cur[2]])
+                .sort(
+                    (a, b) =>
+                        getFieldDate(a[1]).getTime() -
+                        getFieldDate(b[1]).getTime()
+                )
+                .reduce((all, cur) => {
+                    const date = getFieldDate(cur[1])
+                    const month = date.getMonth() + 1
+                    const year = date.getFullYear()
+                    const today = new Date()
+                    const isToday =
+                        today.getMonth() + 1 === month &&
+                        today.getFullYear() === year &&
+                        today.getDate() === date.getDate()
+                    const isBeforeToday =
+                        !isToday && today.getTime() > date.getTime()
+                    const isAfterToday = !isToday && !isBeforeToday
 
-                all.push(...datesOfItem)
-                return all
-            }, [])
-            .sort((a, b) => getFieldDate(a[1]).getTime() - getFieldDate(b[1]).getTime())
-            .reduce((all, cur) => {
-                const date = getFieldDate(cur[1])
-                const month = date.getMonth() + 1
-                const year = date.getFullYear()
-                const today = new Date()
-                const isToday = 
-                    today.getMonth() + 1 === month 
-                    && today.getFullYear() === year
-                    && today.getDate() === date.getDate()
-                const isBeforeToday = !isToday 
-                    && (today.getTime() > date.getTime())
-                const isAfterToday = !isToday && !isBeforeToday
-
-                if(
-                    all.length > 0 
-                    && (
+                    if (
+                        all.length > 0 &&
                         // Is today
-                        isToday && all[all.length - 1].isToday
-                        ||
-                        // Is not today but fits
-                        !isToday && !all[all.length - 1].isToday
-                        && all[all.length - 1].month === month 
-                        && all[all.length - 1].year === year
-                        && all[all.length -1].isBeforeToday === isBeforeToday
-                    )
-                ) {
-                    all[all.length - 1].dates.push(cur)
-                }else {
-                    const category = {
-                        month, year, isToday, isBeforeToday, isAfterToday,
-                        dates: [cur]
+                        ((isToday && all[all.length - 1].isToday) ||
+                            // Is not today but fits
+                            (!isToday &&
+                                !all[all.length - 1].isToday &&
+                                all[all.length - 1].month === month &&
+                                all[all.length - 1].year === year &&
+                                all[all.length - 1].isBeforeToday ===
+                                    isBeforeToday))
+                    ) {
+                        all[all.length - 1].dates.push(cur)
+                    } else {
+                        const category = {
+                            month,
+                            year,
+                            isToday,
+                            isBeforeToday,
+                            isAfterToday,
+                            dates: [cur]
+                        }
+                        all.push(category)
                     }
-                    all.push(category)
-                }
-                return all
-            }, [])
-            .map(category => ({
-                ...category,
-                visible: category.dates.reduce((all, cur) => all || cur[3], false)
-            }))
+                    return all
+                }, [])
+                .map((category) => ({
+                    ...category,
+                    visible: category.dates.reduce(
+                        (all, cur) => all || cur[3],
+                        false
+                    )
+                }))
         },
         datesBeforeToday() {
-            return this.dates.filter(({isBeforeToday}) => isBeforeToday)
+            return this.dates.filter(({ isBeforeToday }) => isBeforeToday)
         },
         dateToday() {
-            return this.dates.find(({isToday}) => isToday)
+            return this.dates.find(({ isToday }) => isToday)
         },
         datesAfterToday() {
-            return this.dates.filter(({isAfterToday}) => isAfterToday)
+            return this.dates.filter(({ isAfterToday }) => isAfterToday)
         },
         itemWrapper() {
             return this.editMode ? VueDraggableNext : 'div'
@@ -147,99 +172,125 @@ export default {
 </script>
 
 <template>
-<main>
-    <button class="fab" @click="editMode = !editMode">
-        <fa-icon :icon="`fa-solid ${editMode ? 'fa-xmark' : 'fa-up-down'}`" />
-    </button>
-
-    <div class="tags">
-        <template v-for="tag, i in tagsAvailable" :key="`TAG-${i}`">
-        <button :class="isTagActive(tag) ? 'on' : ''" @click="toggleTag(i)" :style="`background-color: ${tag.name};`">
-
-        </button>
-        </template>
-    </div>
-
-    <section class="todo">
-        <component :is="itemWrapper" v-model="items">
-            <template v-for="[item, index, visible] in items" :key="`ITEM-${index}`">
-            <item-component
-                :item="item"
-                :index="index"
-                :visible="visible"
-                :editMode="editMode"
+    <main>
+        <button class="fab" @click="editMode = !editMode">
+            <fa-icon
+                :icon="`fa-solid ${editMode ? 'fa-xmark' : 'fa-up-down'}`"
             />
-            </template>
-        </component>
-
-        <button class="add-item" @click="addItem()">
-            <fa-icon icon="fa-solid fa-plus" />
         </button>
-    </section>
 
-    <section class="timeline">
-        <template v-for="category, h in datesBeforeToday" :key="`DATES-${h}`">
-        <transition name="date-category">
-            <div v-if="category.dates.find(date => date[3])">
-                <h2>{{ getDateString(category.month, category.year) }}</h2>
-            </div>
-        </transition>
-
-        <template v-for="[item, field, i, visible], j in category.dates" :key="`DATES-${h}-DATE-${j}-ITEM-${i}`">
-        <date-component
-            :item="item"
-            :field="field"
-            :itemIndex="i"
-            :index="j"
-            :visible="visible"
-        />
-        </template>
-        </template>
-
-        <div class="category-today">
-            <h2>Today</h2>
-
-            <p class="nothing-text">
-                <div v-if="!dateToday">
-                    <i>nothing to do..</i>
-                </div>
-                <div v-else-if="!dateToday.dates.find(date => date[3])">
-                    <i>nothing to see..</i>
-                </div>
-            </p>
-
-            <template v-if="dateToday?.dates">
-            <template v-for="[item, field, i, visible], j in dateToday.dates" :key="`DATES-TODAY-DATE-${j}-ITEM-${i}`">
-            <date-component
-                :item="item"
-                :field="field"
-                :itemIndex="i"
-                :index="j"
-                :visible="visible"
-            />
-            </template>
+        <div class="tags">
+            <template v-for="(tag, i) in tagsAvailable" :key="`TAG-${i}`">
+                <button
+                    :class="isTagActive(tag) ? 'on' : ''"
+                    @click="toggleTag(i)"
+                    :style="`background-color: ${tag.name};`"
+                ></button>
             </template>
         </div>
 
-        <template v-for="category, h in datesAfterToday" :key="`DATES-${h}`">
-        <transition name="date-category">
-            <div v-if="category.dates.find(date => date[3])">
-                <h2>{{ getDateString(category.month, category.year) }}</h2>
-            </div>
-        </transition>
+        <section class="todo">
+            <component :is="itemWrapper" v-model="items">
+                <template
+                    v-for="[item, index, visible] in items"
+                    :key="`ITEM-${index}`"
+                >
+                    <item-component
+                        :item="item"
+                        :index="index"
+                        :visible="visible"
+                        :editMode="editMode"
+                    />
+                </template>
+            </component>
 
-        <template v-for="[item, field, i, visible], j in category.dates" :key="`DATES-${h}-DATE-${j}-ITEM-${i}`">
-        <date-component
-            :item="item"
-            :field="field"
-            :itemIndex="i"
-            :index="j"
-            :visible="visible"
-        />
-        </template>
-        </template>
-    </section>
-</main>
+            <button class="add-item" @click="addItem()">
+                <fa-icon icon="fa-solid fa-plus" />
+            </button>
+        </section>
+
+        <section class="timeline">
+            <template
+                v-for="(category, h) in datesBeforeToday"
+                :key="`DATES-${h}`"
+            >
+                <transition name="date-category">
+                    <div v-if="category.dates.find((date) => date[3])">
+                        <h2>
+                            {{ getDateString(category.month, category.year) }}
+                        </h2>
+                    </div>
+                </transition>
+
+                <template
+                    v-for="([item, field, i, visible], j) in category.dates"
+                    :key="`DATES-${h}-DATE-${j}-ITEM-${i}`"
+                >
+                    <date-component
+                        :item="item"
+                        :field="field"
+                        :itemIndex="i"
+                        :index="j"
+                        :visible="visible"
+                    />
+                </template>
+            </template>
+
+            <div class="category-today">
+                <h2>Today</h2>
+
+                <div v-if="!dateToday">
+                    <p class="nothing-text"><i>nothing to do..</i></p>
+                </div>
+                <div v-else-if="!dateToday.dates.find((date) => date[3])">
+                    <p class="nothing-text"><i>nothing to see..</i></p>
+                </div>
+
+                <template v-if="dateToday?.dates">
+                    <template
+                        v-for="(
+                            [item, field, i, visible], j
+                        ) in dateToday.dates"
+                        :key="`DATES-TODAY-DATE-${j}-ITEM-${i}`"
+                    >
+                        <date-component
+                            :item="item"
+                            :field="field"
+                            :itemIndex="i"
+                            :index="j"
+                            :visible="visible"
+                        />
+                    </template>
+                </template>
+            </div>
+
+            <template
+                v-for="(category, h) in datesAfterToday"
+                :key="`DATES-${h}`"
+            >
+                <transition name="date-category">
+                    <div v-if="category.dates.find((date) => date[3])">
+                        <h2>
+                            {{ getDateString(category.month, category.year) }}
+                        </h2>
+                    </div>
+                </transition>
+
+                <template
+                    v-for="([item, field, i, visible], j) in category.dates"
+                    :key="`DATES-${h}-DATE-${j}-ITEM-${i}`"
+                >
+                    <date-component
+                        :item="item"
+                        :field="field"
+                        :itemIndex="i"
+                        :index="j"
+                        :visible="visible"
+                    />
+                </template>
+            </template>
+        </section>
+    </main>
 </template>
 
 <style scoped>
@@ -264,7 +315,7 @@ div.tags {
     bottom: 0;
 
     width: 30px;
-    
+
     display: flex;
     flex-direction: column;
 
@@ -272,17 +323,19 @@ div.tags {
 }
 
 div.tags button {
-    margin-top: calc(.5em + 3px);
-    margin-bottom: calc(.5em + 3px);
+    margin-top: calc(0.5em + 3px);
+    margin-bottom: calc(0.5em + 3px);
 
-    width: calc(20px + .5em - 3px);
+    width: calc(20px + 0.5em - 3px);
     height: 60px;
 
     border: none;
 
     border-radius: 0 5px 5px 0;
 
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow:
+        0 4px 8px 0 rgba(0, 0, 0, 0.2),
+        0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
     background-color: var(--color-1);
 
@@ -290,7 +343,7 @@ div.tags button {
 }
 
 div.tags button.on {
-    width: calc(30px + .5em - 3px);
+    width: calc(30px + 0.5em - 3px);
 
     outline: solid 3px var(--text-1);
 }
@@ -317,13 +370,12 @@ section.todo .add-item {
     background-color: var(--color-1);
     border: none;
     border-radius: 15px;
-    padding: .5em;
+    padding: 0.5em;
 
     cursor: pointer;
 
     animation: add-item-button-spawn-animation 600ms ease-out;
 }
-
 
 @keyframes add-item-button-spawn-animation {
     from {
@@ -343,7 +395,7 @@ section.todo .add-item svg {
 }
 
 section.timeline {
-    padding: 1em 0 1em calc(35px + 1em); 
+    padding: 1em 0 1em calc(35px + 1em);
 
     border-right: solid 5px var(--color-3);
 }
@@ -393,10 +445,12 @@ section.timeline .category-today .nothing-text > * {
     }
 }
 
-.date-category-enter-to, .date-category-leave-from {
+.date-category-enter-to,
+.date-category-leave-from {
     max-height: 40vw;
 }
-.date-category-enter-from, .date-category-leave-to {
+.date-category-enter-from,
+.date-category-leave-to {
     max-height: 0;
     padding-top: 0;
     padding-bottom: 0;
@@ -404,9 +458,10 @@ section.timeline .category-today .nothing-text > * {
     margin-bottom: 0;
     opacity: 0;
 }
-.date-category-enter-active, .date-category-leave-active {
+.date-category-enter-active,
+.date-category-leave-active {
     overflow: clip;
-    transition: 
+    transition:
         max-height 200ms,
         padding-top 200ms,
         padding-bottom 200ms,

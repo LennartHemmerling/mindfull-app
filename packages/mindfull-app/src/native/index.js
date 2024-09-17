@@ -1,12 +1,12 @@
 import { KeepAwake } from '@capacitor-community/keep-awake'
 
 export const keepAwake = async () => {
-    if(await isSupported() && !await isKeptAwake())
+    if ((await isSupported()) && !(await isKeptAwake()))
         await KeepAwake.keepAwake()
 }
 
 export const allowSleep = async () => {
-    if(await isSupported() && await isKeptAwake())
+    if ((await isSupported()) && (await isKeptAwake()))
         await KeepAwake.allowSleep()
 }
 
